@@ -6,6 +6,7 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
+  UserType,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -214,5 +215,21 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchUser(username: string, password: string) {
+  try {
+    const data = await sql<UserType[]>`
+      SELECT id 
+      FROM users 
+      WHERE (email = ${username} OR name = ${username}) 
+      AND password = crypt(${password}, password);
+    `;
+
+    return data;
+  } catch (err) {
+    console.error("Database error: ", err);
+    throw new Error("Failed to fetch users!");
   }
 }
